@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1030">
+<title>クイズパネル 回答</title>
+<meta name="description" content="クイズに参加して回答するページ">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='10' width='56' height='40' rx='6' fill='%231b2a6b'/%3E%3Crect x='10' y='16' width='44' height='28' rx='3' fill='%23fff'/%3E%3Ccircle cx='32' cy='30' r='9' fill='none' stroke='%23e8382f' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/player.css">
+</head>
+<body>
+<div id="join" class="screen join">
+  <div class="join-box">
+    <div class="logo">Q</div>
+    <h1>クイズに参加</h1>
+    <form id="joinForm" autocomplete="off">
+      <label for="inCode">参加コード（6桁）</label>
+      <input id="inCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="123456">
+      <label for="inName">名前（ホストの画面に表示されます）</label>
+      <input id="inName" type="text" maxlength="12" placeholder="例：たろう" enterkeyhint="go">
+      <div id="joinMsg" class="join-msg" hidden></div>
+      <button id="joinBtn" class="btn primary big" type="submit">参加する</button>
+    </form>
+    <p class="note">参加コードはホストの画面に表示されている6桁の数字です。</p>
+    <p id="storageWarn" class="note warn" hidden>このブラウザでは情報を保存できないため、ページを再読み込みすると参加し直しになります。</p>
+  </div>
+</div>
+
+<div id="main" class="screen main" hidden>
+  <header class="top">
+    <div class="me"><span class="me-name" id="meName"></span><span class="me-code">コード <b id="meCode"></b></span></div>
+    <div id="net" class="net"></div>
+  </header>
+  <div id="body" class="body"></div>
+  <footer class="foot"><button id="leaveBtn" class="btn ghost small">退出する</button></footer>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/config.js"></script>
+<script src="js/net.js"></script>
+<script src="js/common.js"></script>
+<script src="js/player.js"></script>
+</body>
+</html>
