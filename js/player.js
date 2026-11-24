@@ -302,8 +302,12 @@
   function viewKey() {
     if (!st) return 'none';
     var q = st.q || {};
-    return st.ph + '|' + (q.id || '') + '|' + (q.r || '') + '|' + (st.ph === 'judged' || st.ph === 'final' ? st.ts : '');
+    return (st.mode || 'quiz') + '|' + st.ph + '|' + (q.id || '') + '|' + (q.r || '') + '|' + (st.ph === 'judged' || st.ph === 'final' ? st.ts : '');
   }
+
+  // アンケートモード（ホストの設定）では、得点・順位・正解を出さない
+  function survey() { return !!(st && st.mode === 'survey'); }
+  function qLabel(no) { return survey() ? '質問' + no : '第' + no + '問'; }
 
   function myScore() { return st && st.sc && st.sc[sess.pid] || 0; }
   function myRank() {
@@ -316,8 +320,8 @@
 
   function questionHtml() {
     var q = st.q;
-    var h = '<div class="qbox"><div class="qno">第' + q.no + '問<small>／全' + st.total + '問</small>' +
-      (q.pts ? '<span class="pts">' + q.pts + '点</span>' : '') + '</div>';
+    var h = '<div class="qbox"><div class="qno">' + qLabel(q.no) + '<small>／全' + st.total + '問</small>' +
+      (q.pts && !survey() ? '<span class="pts">' + q.pts + '点</span>' : '') + '</div>';
     h += '<div class="qtext">' + esc(q.text || '') + '</div>';
     if (st.ph !== 'open' && q.type === 'choice' && q.ch) {
       h += '<ol class="qch">' + q.ch.map(function (c, i) { return '<li><b class="cl c' + i + '">' + QP.choiceLabel(i) + '</b>' + esc(c) + '</li>'; }).join('') + '</ol>';
@@ -340,6 +344,9 @@
     }
     var q = st.q;
     var a = myAnswer();
+    if (st.ph === 'final' && survey()) {
+      return '<div class="center-msg"><div class="big">ご協力ありがとうございました</div></div>';
+    }
     if (st.ph === 'final') {
       var rk = myRank();
       return '<div class="result final"><div class="r-label">最終結果</div>' +
@@ -348,8 +355,9 @@
     }
     if (st.ph === 'waiting' || !q) {
       return '<div class="center-msg">' +
-        (q ? '<div class="qno-big">第' + q.no + '問</div><div class="big">まもなく出題されます</div>' : '<div class="big">クイズの開始を待っています</div>') +
-        '<div class="muted">いまの得点：<b>' + myScore() + '</b>点</div></div>';
+        (q ? '<div class="qno-big">' + qLabel(q.no) + '</div><div class="big">まもなく出題されます</div>'
+          : '<div class="big">' + (survey() ? '開始を待っています' : 'クイズの開始を待っています') + '</div>') +
+        (survey() ? '' : '<div class="muted">いまの得点：<b>' + myScore() + '</b>点</div>') + '</div>';
     }
     if (st.ph === 'open') {
       var h = questionHtml();
@@ -358,9 +366,10 @@
       h += '<div class="ans-status" id="ansStatus"></div>';
       return h;
     }
-    if (st.ph === 'closed') {
+    if (st.ph === 'closed' || (st.ph === 'judged' && survey())) {
       return questionHtml() + '<div class="phase-msg">締め切りました</div><div class="label">あなたの回答</div>' + answerView(a) +
-        '<div class="ans-status" id="ansStatus"></div><div class="muted center">正解発表をお待ちください</div>';
+        '<div class="ans-status" id="ansStatus"></div><div class="muted center">' +
+        (survey() ? '回答ありがとうございました' : '正解発表をお待ちください') + '</div>';
     }
     if (st.ph === 'judged') {
       var j = st.res ? st.res[sess.pid] : undefined;
